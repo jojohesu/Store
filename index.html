@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your Custom Burger! 🍔</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS Variables --- */
+        /* Define a variable for header height to use in padding calculations */
+        :root {
+            --header-height-desktop: 120px; /* Approximate height of header on desktop */
+            --header-height-mobile: 180px;  /* Approximate height of header on mobile when nav is stacked */
+            --primary-color: #a04000; /* A shade of brown for primary elements */
+            --accent-color: #d35400; /* An orange accent color */
+            --success-color: #2ecc71; /* Green for success/add actions */
+            --danger-color: #e74c3c; /* Red for danger/delete actions */
+            --info-color: #3498db; /* Blue for info/edit actions */
+            --card-bg-color: #ffffff; /* White background for cards and sections */
+            --body-bg-color: #ffffff; /* White background for the entire body */
+            --text-dark: #333; /* Dark gray text color */
+            --text-medium: #555; /* Medium gray text color */
+            --text-light: #777; /* Light gray text color */
+        }
+
+        /* --- Basic Reset and Global Styles --- */
+        * {
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            box-sizing: border-box; /* Use border-box model for easier layout */
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif; /* Set default font family to Open Sans for professionalism */
+            background-color: var(--body-bg-color); /* White background color for the entire body */
+            color: var(--text-dark); /* Dark gray text color */
+            line-height: 1.6; /* Set line height for readability */
+            display: flex; /* Use flexbox for overall layout */
+            flex-direction: column; /* Stack children vertically */
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+
+        /* --- Header Styles --- */
+        header {
+            background-color: var(--primary-color); /* Primary brown for the header */
+            color: white; /* White text color */
+            padding: 1rem 0; /* Vertical padding, no horizontal padding */
+            text-align: center; /* Center align text */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            position: sticky; /* Keeps the header fixed on scroll */
+            top: 0; /* Stick to the top of the viewport */
+            z-index: 1000; /* Ensures it's above other elements */
+            display: flex; /* Use flexbox for header content */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Vertically align items */
+            padding-left: 20px; /* Padding on the left for the title */
+            padding-right: 20px; /* Padding on the right for the burger icon */
+        }
+
+        header h1 {
+            font-family: 'Open Sans', sans-serif; /* Professional font for the main title */
+            font-size: 2.5rem; /* Large font size for title */
+            margin-bottom: 0; /* Remove bottom margin */
+            flex-grow: 1; /* Allow title to take available space */
+            text-align: center; /* Center the title */
+            margin-left: auto; /* Center title */
+            margin-right: auto; /* Center title */
+        }
+
+        /* Desktop Navigation */
+        nav {
+            display: block; /* Show nav by default on desktop */
+        }
+
+        nav ul {
+            list-style: none; /* Remove bullet points from list */
+            display: flex; /* Use flexbox for navigation items */
+            justify-content: center; /* Center navigation items horizontally */
+            padding: 0; /* Remove default padding */
+            margin: 0; /* Remove default margin */
+        }
+
+        nav ul li {
+            margin: 0 1.5rem; /* Horizontal margin between list items */
+        }
+
+        nav ul li a {
+            color: white; /* White link color */
+            text-decoration: none; /* Remove underline from links */
+            font-weight: bold; /* Bold text */
+            font-size: 1.1rem; /* Font size for links */
+            transition: color 0.3s ease; /* Smooth color transition on hover */
+        }
+
+        nav ul li a:hover {
+            color: #ffe0b2; /* Lighter color on hover */
+        }
+
+        /* Hamburger Menu Icon */
+        .hamburger-icon {
+            display: none; /* Hidden by default on desktop */
+            flex-direction: column; /* Stack lines vertically */
+            justify-content: space-around; /* Space out lines */
+            width: 30px; /* Width of the icon */
+            height: 25px; /* Height of the icon */
+            cursor: pointer; /* Pointer cursor */
+            z-index: 1001; /* Above header content */
+            padding: 5px; /* Add some padding around the icon */
+            box-sizing: content-box; /* Don't include padding in width/height */
+            position: absolute; /* Position absolutely to allow h1 to center */
+            right: 20px; /* Align to the right */
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Adjust for vertical centering */
+        }
+
+        .hamburger-icon .bar {
+            width: 100%; /* Full width for each bar */
+            height: 3px; /* Height of each bar */
+            background-color: white; /* White color for bars */
+            transition: all 0.3s ease-in-out; /* Smooth transition for animation */
+        }
+
+        /* --- Overlay Menu (Mobile/Tablet) - Glassmorphism Effect --- */
+        .overlay-menu {
+            height: 100%; /* Full height */
+            width: 0; /* Start hidden */
+            position: fixed; /* Fixed position */
+            z-index: 1002; /* Higher than header */
+            top: 0; /* Align to top */
+            right: 0; /* Align to right */
+            background-color: rgba(160, 64, 0, 0.0); /* COMPLETELY TRANSPARENT */
+            /* Glassmorphism effect */
+            backdrop-filter: blur(10px); /* Apply blur to the background content */
+            -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border for glass effect */
+            overflow-x: hidden; /* Hide horizontal scroll */
+            transition: 0.5s; /* Smooth transition for opening/closing */
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center items vertically */
+        }
+
+        .overlay-menu .close-btn {
+            position: absolute; /* Absolute position */
+            top: 20px; /* From top */
+            right: 45px; /* From right */
+            font-size: 60px; /* Large font size for close button */
+            color: var(--text-light); /* Light gray color */
+            text-decoration: none; /* Remove underline */
+            cursor: pointer; /* Pointer cursor */
+        }
+
+        .overlay-menu-content {
+            padding-top: 60px; /* Padding from the top */
+            text-align: center; /* Center align text */
+            width: 100%; /* Full width */
+        }
+
+        .overlay-menu-content a {
+            padding: 15px 0; /* Vertical padding for links */
+            text-decoration: none; /* Remove underline */
+            font-size: 25px; /* Font size for links */
+            color: var(--text-dark); /* CHANGED: Darker color for better visibility */
+            display: block; /* Make links block level */
+            transition: 0.3s; /* Smooth transition for hover */
+        }
+
+        .overlay-menu-content a:hover, .overlay-menu-content a:focus {
+            color: var(--primary-color); /* CHANGED: Brown color on hover */
+            background-color: rgba(0, 0, 0, 0.05); /* Subtle background change */
+        }
+
+        /* --- Main Content Styles --- */
+        main {
+            display: flex; /* Use flexbox for main content */
+            flex-direction: column; /* Stack sections vertically */
+            align-items: center; /* Center items horizontally */
+            padding: 2rem; /* Overall padding for the main area */
+            flex-grow: 1; /* Allows main to take available space */
+            max-width: 1200px; /* Maximum width for content */
+            margin: 0 auto; /* Centers the main container */
+            padding-top: calc(2rem + var(--header-height-desktop)); /* Adjust padding to clear fixed header on desktop */
+        }
+
+        section {
+            background-color: var(--card-bg-color); /* White background for cards and sections */
+            padding: 2.5rem; /* Inner padding for sections */
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            margin-bottom: 2.5rem; /* Space between sections */
+            width: 100%; /* Full width */
+            max-width: 900px; /* Max width for sections */
+            animation: fadeIn 0.8s ease-out; /* Fade-in animation */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); } /* Start invisible and slightly below */
+            to { opacity: 1; transform: translateY(0); } /* End fully visible at original position */
+        }
+
+        section h2 {
+            font-family: 'Open Sans', sans-serif; /* Formal font for section titles */
+            font-size: 2rem; /* Font size for titles */
+            color: var(--accent-color); /* Orange color for section titles */
+            text-align: center; /* Center align title */
+            margin-bottom: 1.8rem; /* Space below title */
+        }
+
+        /* --- Burger Creator Section Styles --- */
+        #burger-creator {
+            display: flex; /* Use flexbox for preview and controls */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 2rem; /* Gap between preview and controls */
+            justify-content: center; /* Center items */
+            align-items: flex-start; /* Align items to the top */
+        }
+
+        #burger-preview {
+            width: 100%; /* Full width on smaller screens */
+            max-width: 300px; /* Max width for preview */
+            min-height: 280px; /* Minimum height for the burger preview */
+            max-height: 450px; /* Maximum height to allow for taller burgers */
+            overflow-y: auto; /* Enable vertical scrolling if burger exceeds max-height */
+            background-color: #f7f7f7; /* Light background for preview area */
+            border-radius: 10px; /* Rounded corners */
+            border: 1px solid #ddd; /* Light border */
+            display: flex; /* Use flexbox for ingredients */
+            flex-direction: column; /* Stack ingredients vertically */
+            align-items: center; /* Center ingredients horizontally */
+            justify-content: flex-end; /* Align items to the bottom (where bottom bun is) */
+            position: relative; /* For absolute positioning of ingredients */
+            padding-bottom: 10px; /* Space for the bottom bun */
+            padding-top: 10px; /* Space for the top bun */
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05); /* Inner shadow */
+            margin: 0 auto; /* Center the preview horizontally on smaller screens */
+        }
+
+        .burger-ingredient {
+            width: 90%; /* Width of ingredients relative to preview */
+            height: auto; /* Allow height to adjust based on image */
+            position: absolute; /* Position ingredients precisely */
+            left: 5%; /* To center them horizontally */
+            right: 5%;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bouncy transition for adding/removing */
+            transform-origin: center bottom; /* For scaling/rotation from bottom center */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+            border-radius: 5px; /* Default border-radius */
+            opacity: 1; /* Default opacity for animation */
+        }
+
+        .burger-ingredient img {
+            display: block; /* Ensure image takes full width */
+            width: 100%; /* Full width of its container */
+            height: 100%; /* Full height of its container */
+            object-fit: cover; /* Cover the container while maintaining aspect ratio */
+            border-radius: inherit; /* Inherit border-radius from parent */
+        }
+
+        /* Animation classes for adding/removing ingredients */
+        .burger-ingredient.adding {
+            transform: translateY(-150%) scale(0.7); /* Start far above, scaled down */
+            opacity: 0; /* Start invisible */
+        }
+        .burger-ingredient.added {
+            transform: translateY(0) scale(1); /* End at normal position, full scale */
+            opacity: 1; /* End fully visible */
+        }
+        .burger-ingredient.removing {
+            transform: translateY(150%) scale(0.7); /* Fall downwards, scaled down */
+            opacity: 0; /* End invisible */
+        }
+
+        /* Specific styles for bun images to cover their containers */
+        .burger-ingredient.bun-top {
+            height: 60px; /* Specific height for top bun */
+            border-top-left-radius: 50%; /* Rounded top */
+            border-top-right-radius: 50%;
+            border-bottom-left-radius: 10px; /* Slightly rounded bottom */
+            border-bottom-right-radius: 10px;
+            z-index: 100; /* Always on top */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+        }
+
+        .burger-ingredient.bun-bottom {
+            height: 45px; /* Specific height for bottom bun */
+            border-bottom-left-radius: 10px; /* Slightly rounded bottom */
+            border-bottom-right-radius: 10px;
+            border-top-left-radius: 5px; /* Less rounded top */
+            border-top-right-radius: 5px;
+            z-index: 1; /* Always at the bottom */
+            box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.15); /* Shadow for base */
+        }
+
+        /* Specific ingredient heights and custom shapes/images */
+        .burger-ingredient.meat { height: 45px; z-index: 10; } /* Meat patty height */
+        .burger-ingredient.cheese { height: 15px; z-index: 20; } /* Cheese slice height */
+        .burger-ingredient.lettuce { height: 20px; z-index: 30; } /* Lettuce height */
+        .burger-ingredient.tomato { height: 25px; border-radius: 50%; width: 70%; left: 15%; right: 15%; z-index: 40; } /* Round for tomato slices */
+        .burger-ingredient.onion { height: 20px; border-radius: 50%; width: 70%; left: 15%; right: 15%; z-index: 50; } /* Round for onion rings */
+        .burger-ingredient.bacon { height: 15px; z-index: 60; } /* Bacon height */
+        .burger-ingredient.pickles { height: 18px; z-index: 70; } /* Pickles height */
+        .burger-ingredient.egg { height: 30px; border-radius: 50%; width: 70%; left: 15%; right: 15%; z-index: 80; } /* Round for fried egg */
+        .burger-ingredient.jalapenos { height: 15px; z-index: 90; } /* Jalapeños height */
+        .burger-ingredient.mushrooms { height: 20px; z-index: 91; } /* Mushrooms height */
+        .burger-ingredient.avocado { height: 25px; z-index: 92; } /* Avocado height */
+        .burger-ingredient.bbq-sauce { height: 10px; border-radius: 20%; z-index: 93; } /* Flatter for sauce */
+
+        /* Custom ingredient */
+        .burger-ingredient.custom-ingredient {
+            background-color: #8d6e63; /* Neutral color if no image provided */
+            color: white; /* White text */
+            font-size: 0.7em; /* Smaller font size */
+            display: flex; /* Flexbox for centering text */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+            height: 25px; /* Default height for custom */
+            z-index: 99; /* Custom ingredients should be high */
+        }
+        .burger-ingredient.custom-ingredient img {
+            display: none; /* Hide image for custom if text is displayed */
+        }
+
+        .ingredient-controls {
+            flex: 1; /* Allow controls to take available space */
+            min-width: 300px; /* Minimum width for controls */
+        }
+
+        .ingredient-group {
+            margin-bottom: 1.5rem; /* Space below ingredient groups */
+        }
+
+        .ingredient-group label {
+            display: block; /* Make label a block element */
+            font-weight: bold; /* Bold text */
+            margin-bottom: 0.8rem; /* Space below label */
+            font-size: 1.1rem; /* Font size for labels */
+            color: var(--accent-color); /* Orange color */
+        }
+
+        .ingredient-buttons {
+            display: flex; /* Use flexbox for buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap */
+            gap: 0.7rem; /* Gap between buttons */
+            justify-content: center; /* Center buttons within their container */
+        }
+
+        .ingredient-buttons button {
+            background-color: #ff8c00; /* Orange background */
+            color: white; /* White text */
+            border: none; /* No border */
+            padding: 0.7rem 1.2rem; /* Padding for buttons */
+            border-radius: 25px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 0.95rem; /* Font size */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 100px; /* Minimum width for buttons */
+            text-align: center; /* Ensure text is centered in buttons */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .ingredient-buttons button:hover {
+            background-color: #e67e22; /* Darker orange on hover */
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* More prominent shadow on hover */
+        }
+
+        .ingredient-buttons button.active {
+            background-color: var(--success-color); /* Green background when active */
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.4); /* Green glow shadow */
+            border: 2px solid var(--success-color); /* Green border */
+            transform: translateY(-1px); /* Slight lift */
+        }
+
+        .custom-ingredient-input {
+            display: flex; /* Flexbox for custom ingredient input */
+            gap: 0.5rem; /* Gap between input fields and button */
+            margin-top: 1rem; /* Space above */
+            flex-wrap: wrap; /* Allow wrapping */
+        }
+
+        .custom-ingredient-input input[type="text"],
+        .custom-ingredient-input input[type="number"] {
+            flex-grow: 1; /* Allow inputs to grow */
+            padding: 0.8rem; /* Padding inside inputs */
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 8px; /* Rounded corners */
+            font-size: 1rem; /* Font size */
+            min-width: 120px; /* Minimum width for inputs */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .custom-ingredient-input input[type="text"]:focus,
+        .custom-ingredient-input input[type="number"]:focus {
+            outline: none;
+            border-color: var(--info-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        .custom-ingredient-input button {
+            background-color: var(--info-color); /* Blue background */
+            color: white; /* White text */
+            border: none; /* No border */
+            padding: 0.8rem 1.2rem; /* Padding for button */
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 1rem; /* Font size */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transition */
+            flex-shrink: 0; /* Prevent button from shrinking too much */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-ingredient-input button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #custom-ingredient-error {
+            color: var(--danger-color); /* Red color for error message */
+            font-size: 0.9rem; /* Smaller font size */
+            margin-top: 0.5rem; /* Space above */
+            text-align: center; /* Center align text */
+            display: none; /* Hidden by default */
+            width: 100%; /* Take full width */
+        }
+
+        .burger-total {
+            margin-top: 2rem; /* Space above total */
+            text-align: center; /* Center align text */
+            font-size: 1.5rem; /* Large font size */
+            font-weight: bold; /* Bold text */
+            color: var(--success-color); /* Green color */
+        }
+
+        .action-buttons {
+            display: flex; /* Use flexbox for action buttons */
+            justify-content: center; /* Center buttons horizontally */
+            gap: 1.5rem; /* Gap between buttons */
+            margin-top: 2rem; /* Space above buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap */
+        }
+
+        .action-buttons button {
+            padding: 1rem 2rem; /* Padding for buttons */
+            border: none; /* No border */
+            border-radius: 30px; /* Highly rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 1.1rem; /* Font size */
+            font-weight: bold; /* Bold text */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        }
+
+        #save-burger-btn { background-color: #f39c12; color: white; } /* Orange save button */
+        #save-burger-btn:hover { background-color: #e67e22; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+
+        #buy-burger-btn { background-color: var(--success-color); color: white; } /* Green buy button (not used in this version but kept for consistency) */
+        #buy-burger-btn:hover { background-color: #27ae60; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+
+        #clear-burger-btn { background-color: var(--danger-color); color: white; } /* Red clear button */
+        #clear-burger-btn:hover { background-color: #c0392b; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+
+        /* --- Created Burgers List Styles --- */
+        #created-burgers-list {
+            display: grid; /* Use grid for burger cards */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid columns */
+            gap: 1.5rem; /* Gap between grid items */
+            margin-top: 1.5rem; /* Space above the list */
+        }
+
+        .burger-card {
+            background-color: var(--card-bg-color); /* White background for cards */
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            padding: 1.5rem; /* Inner padding */
+            text-align: center; /* Center align text */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            display: flex; /* Use flexbox for card content */
+            flex-direction: column; /* Stack content vertically */
+            justify-content: space-between; /* Space out content vertically */
+        }
+
+        .burger-card:hover {
+            transform: translateY(-8px); /* Lift on hover */
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+        }
+
+        .burger-card h3 {
+            font-family: 'Open Sans', sans-serif; /* Formal font for burger name */
+            color: var(--accent-color); /* Orange color */
+            font-size: 1.8rem; /* Large font size */
+            margin-bottom: 0.8rem; /* Space below title */
+        }
+
+        .burger-card p {
+            font-size: 0.95rem; /* Font size for paragraph */
+            color: var(--text-medium); /* Darker gray text */
+            margin-bottom: 0.6rem; /* Space below paragraph */
+        }
+
+        .burger-card .price {
+            font-weight: bold; /* Bold text */
+            color: var(--success-color); /* Green color */
+            font-size: 1.3rem; /* Larger font size */
+            margin-top: 1rem; /* Space above price */
+            margin-bottom: 1.2rem; /* Space below price */
+        }
+
+        .burger-card .card-actions {
+            display: flex; /* Use flexbox for action buttons */
+            justify-content: center; /* Center buttons */
+            gap: 0.8rem; /* Gap between buttons */
+            margin-top: auto; /* Push actions to the bottom */
+            flex-wrap: wrap; /* Allow buttons to wrap */
+        }
+
+        .burger-card .card-actions button {
+            padding: 0.6rem 1rem; /* Padding for buttons */
+            border: none; /* No border */
+            border-radius: 25px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 0.9rem; /* Font size */
+            font-weight: bold; /* Bold text */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        }
+
+        .burger-card .card-actions button.edit-btn { background-color: var(--info-color); color: white; } /* Blue edit button */
+        .burger-card .card-actions button.edit-btn:hover { background-color: #2980b9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); }
+
+        .burger-card .card-actions button.add-to-order-btn-burger { background-color: var(--success-color); color: white; } /* Green add to order button */
+        .burger-card .card-actions button.add-to-order-btn-burger:hover { background-color: #27ae60; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); }
+
+        .burger-card .card-actions button.delete-btn { background-color: var(--danger-color); color: white; } /* Red delete button */
+        .burger-card .card-actions button.delete-btn:hover { background-color: #c0392b; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); }
+
+        /* --- Modal Styles --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed position relative to viewport */
+            z-index: 2000; /* High z-index to be on top */
+            left: 0; /* Align to left */
+            top: 0; /* Align to top */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scrolling if content overflows */
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+            display: flex; /* Use flexbox to center content */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            backdrop-filter: blur(5px); /* Apply blur effect to background */
+            -webkit-backdrop-filter: blur(5px); /* Webkit prefix for compatibility */
+        }
+
+        .modal-content {
+            background-color: var(--card-bg-color); /* White background for modal content */
+            margin: auto; /* Auto margin for centering */
+            padding: 30px; /* Inner padding */
+            border-radius: 12px; /* Rounded corners */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+            width: 90%; /* 90% width */
+            max-width: 500px; /* Max width */
+            position: relative; /* For absolute positioning of close button */
+            text-align: center; /* Center align text */
+            animation: slideIn 0.4s ease-out; /* Slide-in animation */
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-50px) scale(0.9); } /* Start invisible, higher, smaller */
+            to { opacity: 1; transform: translateY(0) scale(1); } /* End fully visible, at position, full size */
+        }
+
+        .close-button {
+            color: #aaa; /* Light gray color */
+            font-size: 28px; /* Large font size */
+            font-weight: bold; /* Bold text */
+            position: absolute; /* Absolute position */
+            top: 15px; /* From top */
+            right: 20px; /* From right */
+            cursor: pointer; /* Pointer cursor */
+            transition: color 0.3s ease; /* Smooth color transition */
+        }
+
+        .close-button:hover, .close-button:focus {
+            color: var(--text-dark); /* Darker gray on hover/focus */
+            text-decoration: none; /* Remove underline */
+        }
+
+        .modal-buttons {
+            display: flex; /* Use flexbox for buttons */
+            justify-content: center; /* Center buttons */
+            gap: 1rem; /* Gap between buttons */
+            margin-top: 25px; /* Space above buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap */
+        }
+
+        .modal-buttons button {
+            padding: 0.8rem 1.5rem; /* Padding for buttons */
+            border: none; /* No border */
+            border-radius: 25px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 1rem; /* Font size */
+            font-weight: bold; /* Bold text */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transition */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-buttons button.confirm { background-color: var(--success-color); color: white; } /* Green confirm button */
+        .modal-buttons button.confirm:hover { background-color: #27ae60; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); }
+
+        .modal-buttons button.cancel { background-color: var(--danger-color); color: white; } /* Red cancel button */
+        .modal-buttons button.cancel:hover { background-color: #c0392b; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); }
+
+        #thank-you-modal .modal-content h3 {
+            font-size: 2rem; /* Large font size */
+            color: #28a745; /* Green color */
+            margin-bottom: 1.5rem; /* Space below title */
+        }
+
+        #thank-you-modal .modal-content img {
+            width: 100px; /* Fixed width for image */
+            height: 100px; /* Fixed height for image */
+            margin-bottom: 1rem; /* Space below image */
+        }
+
+        #burger-name-error {
+            color: var(--danger-color); /* Red color for error message */
+            font-size: 0.9rem; /* Smaller font size */
+            margin-top: 0.5rem; /* Space above */
+            text-align: center; /* Center align text */
+            display: none; /* Hidden by default */
+        }
+
+        #burger-name {
+            width: calc(100% - 20px); /* Calculate width for input */
+            padding: 10px; /* Padding inside input */
+            margin-bottom: 1rem; /* Space below input */
+            border: 1px solid #ccc; /* Light border */
+            border-radius: 8px; /* Rounded corners */
+            font-size: 1.1rem; /* Font size */
+            text-align: center; /* Center align text */
+            display: block; /* Make it a block element */
+            margin-left: auto; /* Center horizontally */
+            margin-right: auto;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #burger-name:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(211, 84, 0, 0.3);
+        }
+
+        /* --- Menu Grid for Drinks, Fries, Desserts (Glass Effect) --- */
+        .menu-grid {
+            display: grid; /* Use grid for menu items */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid columns */
+            gap: 2rem; /* Gap between grid items */
+            margin-top: 1.5rem; /* Space above */
+            justify-content: center; /* Center grid items */
+        }
+
+        .glass-card {
+            background-color: var(--card-bg-color); /* White background for cards */
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); /* Stronger shadow */
+            padding: 1.5rem; /* Inner padding */
+            text-align: center; /* Center align text */
+            transform-style: preserve-3d; /* Preserve 3D transformations */
+            transition: transform 0.4s ease-out, box-shadow 0.4s ease-out; /* Smooth transitions */
+            position: relative; /* For relative positioning */
+            display: flex; /* Use flexbox for content */
+            flex-direction: column; /* Stack content vertically */
+            align-items: center; /* Center horizontally */
+            justify-content: space-between; /* Space out content vertically */
+            min-height: 300px; /* Minimum height for cards */
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) rotateX(3deg) rotateY(3deg); /* Lift and rotate on hover */
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25); /* Darker shadow on hover */
+        }
+
+        .glass-card img {
+            max-width: 150px; /* Max width for images */
+            height: auto; /* Auto height */
+            border-radius: 8px; /* Rounded corners */
+            margin-bottom: 1rem; /* Space below image */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            flex-shrink: 0; /* Prevent image from shrinking */
+            object-fit: cover; /* Ensure images fill their space nicely */
+        }
+
+        .glass-card h3 {
+            font-family: 'Open Sans', sans-serif; /* Formal font for title */
+            color: var(--primary-color); /* Brown color */
+            font-size: 1.6rem; /* Font size for title */
+            margin-bottom: 0.5rem; /* Space below title */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); /* Subtle text shadow */
+        }
+
+        .glass-card p {
+            font-size: 0.95rem; /* Font size for paragraph */
+            color: var(--text-medium); /* Darker gray text */
+            margin-bottom: 1rem; /* Space below paragraph */
+            flex-grow: 1; /* Allow paragraph to grow */
+        }
+
+        .glass-card .price {
+            font-weight: bold; /* Bold text */
+            color: var(--accent-color); /* Orange color */
+            font-size: 1.2rem; /* Larger font size */
+            margin-top: auto; /* Push price to the bottom */
+        }
+
+        .glass-card button.add-to-order-btn {
+            background-color: var(--success-color); /* Green background */
+            color: white; /* White text */
+            border: none; /* No border */
+            padding: 0.8rem 1.5rem; /* Padding for button */
+            border-radius: 25px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 1rem; /* Font size */
+            font-weight: bold; /* Bold text */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            margin-top: 1rem; /* Space above button */
+        }
+
+        .glass-card button.add-to-order-btn:hover {
+            background-color: #27ae60; /* Darker green on hover */
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* --- Order Summary Section --- */
+        #order-summary-section {
+            background-color: var(--card-bg-color); /* White background for this section */
+            padding: 2rem; /* Inner padding */
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            margin-top: 2.5rem; /* Space above section */
+            width: 100%; /* Full width */
+            max-width: 900px; /* Max width */
+        }
+
+        #order-summary-section h2 {
+            font-family: 'Open Sans', sans-serif; /* Formal font for title */
+            font-size: 2rem; /* Font size for title */
+            color: var(--primary-color); /* Brown color */
+            text-align: center; /* Center align text */
+            margin-bottom: 1.5rem; /* Space below title */
+        }
+
+        #order-list {
+            list-style: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+            margin-bottom: 1.5rem; /* Space below list */
+        }
+
+        .order-item {
+            display: flex; /* Use flexbox for order items */
+            justify-content: space-between; /* Space out content */
+            align-items: center; /* Center vertically */
+            padding: 0.8rem 0; /* Vertical padding */
+            border-bottom: 1px dashed #eee; /* Dashed bottom border */
+            font-size: 1.1rem; /* Font size */
+            color: var(--text-medium); /* Darker gray text */
+        }
+
+        .order-item:last-child {
+            border-bottom: none; /* No border for the last item */
+        }
+
+        .order-item-name {
+            font-weight: bold; /* Bold text */
+            color: var(--text-dark); /* Darker text */
+        }
+
+        .order-item-actions {
+            display: flex; /* Use flexbox for actions */
+            gap: 0.5rem; /* Gap between actions */
+            align-items: center; /* Center vertically */
+        }
+
+        .order-item-actions button {
+            background-color: var(--danger-color); /* Red background */
+            color: white; /* White text */
+            border: none; /* No border */
+            border-radius: 50%; /* Fully rounded (circle) */
+            width: 28px; /* Fixed width */
+            height: 28px; /* Fixed height */
+            font-size: 1.2rem; /* Font size */
+            cursor: pointer; /* Pointer cursor */
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition */
+            display: flex; /* Center content (minus sign) */
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-item-actions button:hover {
+            background-color: #c0392b; /* Darker red on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        #order-total {
+            text-align: right; /* Right align text */
+            font-size: 1.8rem; /* Large font size */
+            font-weight: bold; /* Bold text */
+            color: var(--success-color); /* Green color */
+            margin-top: 1.5rem; /* Space above total */
+        }
+
+        #order-buttons {
+            display: flex; /* Use flexbox for buttons */
+            justify-content: center; /* Center buttons */
+            gap: 1rem; /* Gap between buttons */
+            margin-top: 2rem; /* Space above buttons */
+            flex-wrap: wrap; /* Allow buttons to wrap */
+        }
+
+        #order-buttons button {
+            padding: 1rem 2rem; /* Padding for buttons */
+            border: none; /* No border */
+            border-radius: 30px; /* Highly rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 1.1rem; /* Font size */
+            font-weight: bold; /* Bold text */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        }
+
+        #checkout-btn {
+            background-color: var(--success-color); /* Green checkout button */
+            color: white; /* White text */
+        }
+
+        #checkout-btn:hover {
+            background-color: #27ae60; /* Darker green on hover */
+            transform: translateY(-3px); /* Slight lift on hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+        }
+
+        #clear-order-list-btn {
+            background-color: var(--danger-color); /* Red clear order button */
+            color: white; /* White text */
+        }
+
+        #clear-order-list-btn:hover {
+            background-color: #c0392b; /* Darker red on hover */
+            transform: translateY(-3px); /* Slight lift on hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+        }
+
+        /* --- Confetti Animation --- */
+        .confetti-container {
+            position: fixed; /* Fixed position relative to viewport */
+            top: 0; /* Align to top */
+            left: 0; /* Align to left */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            pointer-events: none; /* Allows clicks to pass through */
+            overflow: hidden; /* Hide overflowing confetti */
+            z-index: 9999; /* Very high z-index */
+        }
+
+        .confetti {
+            position: absolute; /* Absolute position within container */
+            width: 10px; /* Fixed width */
+            height: 10px; /* Fixed height */
+            background-color: #ff0; /* Default yellow color */
+            opacity: 0; /* Start invisible */
+            animation: confetti-fall linear forwards; /* Apply fall animation */
+            transform-origin: center center; /* Center origin for rotation */
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1; /* Start visible */
+                transform: translate(var(--x), var(--y)) rotate(0deg); /* Start at calculated position */
+            }
+            100% {
+                opacity: 0; /* End invisible */
+                transform: translate(var(--x-end), var(--y-end)) rotate(var(--rotate-end)deg); /* Fall to end position with rotation */
+            }
+        }
+
+        /* --- Scroll to Top Button --- */
+        #scroll-to-top-btn {
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed position */
+            bottom: 30px; /* 30px from the bottom */
+            right: 30px; /* 30px from the right */
+            z-index: 99; /* Ensure it's above other content but below modals */
+            border: none; /* Remove border */
+            outline: none; /* Remove outline */
+            background-color: var(--primary-color); /* Matching header brown */
+            color: white; /* White arrow color */
+            cursor: pointer; /* Pointer cursor on hover */
+            padding: 15px; /* Padding for the button */
+            border-radius: 50%; /* Make it round */
+            font-size: 24px; /* Size of the arrow icon */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease; /* Smooth transitions */
+            opacity: 0; /* Start invisible for transition */
+        }
+
+        #scroll-to-top-btn:hover {
+            background-color: var(--accent-color); /* Darker orange on hover */
+            transform: translateY(-3px); /* Slight lift */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* More prominent shadow */
+        }
+
+        #scroll-to-top-btn.show {
+            opacity: 1; /* Make visible */
+        }
+
+
+        /* --- Media Queries for Responsiveness --- */
+        @media (max-width: 768px) {
+            header {
+                padding: 0.8rem 15px; /* Adjusted padding for header */
+                position: relative; /* Allow hamburger to be absolute relative to header */
+            }
+            header h1 {
+                font-size: 1.6rem; /* ADJUSTED for smaller mobile */
+                text-align: center; /* Center title on mobile */
+                margin-left: auto; /* Ensure centering */
+                margin-right: auto; /* Ensure centering */
+                flex-grow: 0; /* Prevent title from growing too much */
+            }
+            nav {
+                display: none; /* Hide regular navigation */
+            }
+            .hamburger-icon {
+                display: flex; /* Show hamburger icon */
+            }
+            
+            /* Adjust padding for main content on mobile to clear the header */
+            main { padding: 1rem; padding-top: calc(1rem + 80px); } /* Use a fixed safe height for header on mobile */
+            
+            section { padding: 1.5rem 1rem; margin-bottom: 1.5rem; } /* Adjusted padding and margin for sections */
+            section h2 { font-size: 1.4rem; margin-bottom: 1.2rem;} /* ADJUSTED for smaller mobile */
+            
+            /* Overlay Menu Text Size */
+            .overlay-menu-content a {
+                font-size: 1.6rem; /* ADJUSTED for mobile menu readability */
+            }
+
+            #burger-creator { flex-direction: column; align-items: center; gap: 1.5rem; } /* Stack preview and controls vertically */
+            #burger-preview { width: 100%; max-width: 250px; min-height: 220px; max-height: 350px; margin-bottom: 1.5rem; } /* Adjusted max/min height for mobile, centered already by margin: 0 auto */
+            
+            #burger-name {
+                font-size: 0.85rem; /* ADJUSTED */
+                padding: 8px;
+            }
+
+            .burger-total {
+                font-size: 1.2rem; /* ADJUSTED */
+                margin-top: 1.5rem;
+            }
+
+            .ingredient-controls { width: 100%; min-width: unset; } /* Full width for controls */
+            .ingredient-buttons {
+                justify-content: center; /* Center buttons horizontally */
+                gap: 0.5rem; /* Smaller gap */
+            }
+            .ingredient-buttons button {
+                padding: 0.5rem 0.8rem; /* Smaller padding for buttons */
+                font-size: 0.75rem; /* Smaller font size - ADJUSTED */
+                flex-grow: 0; /* Remove flex-grow */
+                width: calc(50% - 0.25rem); /* Two columns layout for buttons */
+            }
+            .custom-ingredient-input { flex-direction: column; gap: 0.4rem; } /* Stack custom ingredient inputs vertically */
+            .custom-ingredient-input input { width: 100%; font-size: 0.85rem; padding: 0.7rem; } /* Full width for inputs - ADJUSTED */
+            .custom-ingredient-input button { width: 100%; font-size: 0.85rem; padding: 0.7rem;} /* Full width for button - ADJUSTED */
+            .action-buttons { flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; } /* Stack action buttons vertically */
+            .action-buttons button { width: 100%; padding: 0.7rem 1.2rem; font-size: 0.9rem; } /* Full width and smaller padding/font for buttons */
+            
+            #created-burgers-list, .menu-grid { grid-template-columns: 1fr; gap: 1rem; } /* Single column grid for cards */
+            .burger-card { padding: 1rem; } /* Smaller padding for burger cards */
+            .burger-card h3 { font-size: 1.3rem; margin-bottom: 0.6rem; } /* Smaller font size for burger card titles - ADJUSTED */
+            .burger-card p { font-size: 0.85rem; margin-bottom: 0.5rem; } /* Smaller font size for ingredients - ADJUSTED */
+            .burger-card .price { font-size: 1rem; margin-top: 0.8rem; margin-bottom: 1rem; } /* Smaller font size for price - ADJUSTED */
+            .burger-card .card-actions button { padding: 0.4rem 0.7rem; font-size: 0.7rem; } /* Smaller padding and font for card action buttons - ADJUSTED */
+            
+            .glass-card { padding: 1.2rem; min-height: 250px; }
+            .glass-card h3 { font-size: 1.2rem; } /* ADJUSTED */
+            .glass-card p { font-size: 0.8rem; } /* ADJUSTED */
+            .glass-card .price { font-size: 1rem; } /* ADJUSTED */
+            .glass-card button.add-to-order-btn { font-size: 0.85rem; padding: 0.7rem 1.2rem; } /* ADJUSTED */
+
+            .modal-content { padding: 15px; width: 95%; } /* Smaller padding and wider modal for mobile */
+            .close-button { font-size: 20px; top: 8px; right: 12px; } /* Smaller close button */
+            .modal-buttons { flex-direction: column; gap: 0.8rem; margin-top: 20px; } /* Stack modal buttons vertically */
+            .modal-buttons button { width: 100%; font-size: 0.9rem; padding: 0.7rem 1.2rem; } /* Full width for modal buttons */
+            
+            #order-buttons { flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; } /* Stack order buttons vertically */
+            #order-buttons button { width: 100%; font-size: 0.9rem; padding: 0.8rem 1.5rem; } /* Full width for order buttons - ADJUSTED */
+            
+            #order-total { font-size: 1.3rem; margin-top: 1.2rem; } /* ADJUSTED */
+            .order-item { font-size: 0.9rem; padding: 0.7rem 0; } /* Smaller font for order items - ADJUSTED */
+            .order-item-actions button { width: 22px; height: 22px; font-size: 0.9rem; } /* Smaller button */
+
+            #scroll-to-top-btn {
+                bottom: 20px; /* Smaller bottom margin */
+                right: 20px; /* Smaller right margin */
+                padding: 10px; /* Smaller padding */
+                font-size: 20px; /* Smaller font size */
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            header h1 { font-size: 2.2rem; }
+            section h2 { font-size: 1.8rem; }
+            .overlay-menu-content a { font-size: 2rem; }
+            #burger-name { font-size: 1rem; }
+            .burger-total { font-size: 1.4rem; }
+            .ingredient-group label { font-size: 1rem; }
+            .ingredient-buttons button { font-size: 0.9rem; padding: 0.6rem 1rem; }
+            .custom-ingredient-input input, .custom-ingredient-input button { font-size: 0.95rem; }
+            .action-buttons button { font-size: 1rem; padding: 0.9rem 1.8rem; }
+
+            #created-burgers-list, .menu-grid { grid-template-columns: repeat(2, 1fr); } /* Two columns for cards */
+            .burger-card h3 { font-size: 1.6rem; }
+            .burger-card p { font-size: 0.9rem; }
+            .burger-card .price { font-size: 1.2rem; }
+            .burger-card .card-actions button { font-size: 0.85rem; padding: 0.5rem 0.9rem; }
+
+            .glass-card h3 { font-size: 1.4rem; }
+            .glass-card p { font-size: 0.9rem; }
+            .glass-card .price { font-size: 1.1rem; }
+            .glass-card button.add-to-order-btn { font-size: 0.95rem; }
+
+            #order-total { font-size: 1.6rem; }
+            .order-item { font-size: 1rem; }
+            #order-buttons button { font-size: 1rem; }
+
+            #burger-creator { flex-direction: row; justify-content: center; } /* Keep side-by-side layout */
+            #burger-preview { margin-right: 2rem; max-width: 300px; } /* Margin right for preview */
+            .ingredient-controls { flex: 1; } /* Allow controls to flex */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🍔 Burger Master</h1> <nav id="desktop-nav">
+            <ul>
+                <li><a href="#burger-creator-section">Build Your Burger</a></li> <li><a href="#all-burgers-section">Your Burgers</a></li> <li><a href="#drinks-section">Drinks</a></li> <li><a href="#fries-section">Fries</a></li> <li><a href="#desserts-section">Desserts</a></li> <li><a href="#order-summary-section">Your Order</a></li> </ul>
+        </nav>
+        <div class="hamburger-icon" id="hamburger-icon">
+            <div class="bar"></div> <div class="bar"></div> <div class="bar"></div> </div>
+    </header>
+
+    <div id="overlay-menu" class="overlay-menu">
+        <a href="javascript:void(0)" class="close-btn" id="close-overlay-btn">&times;</a> <div class="overlay-menu-content">
+            <a href="#burger-creator-section">Build Your Burger</a> <a href="#all-burgers-section">Your Burgers</a> <a href="#drinks-section">Drinks</a> <a href="#fries-section">Fries</a> <a href="#desserts-section">Desserts</a> <a href="#order-summary-section">Your Order</a> </div>
+    </div>
+
+    <main>
+        <section id="burger-creator-section">
+            <h2>Create Your Own Burger</h2> <input type="text" id="burger-name" placeholder="Give your burger a name 🏷️"> <p id="burger-name-error" style="color: var(--danger-color); margin-bottom: 1rem; display: none;">Please enter a name for your burger.</p> <div id="burger-creator">
+                <div id="burger-preview">
+                    </div>
+                <div class="ingredient-controls">
+                    <div class="ingredient-group">
+                        <label>Choose Your Patty:</label> <div class="ingredient-buttons">
+                            <button data-ingredient="beef-patty" data-price="5.00" data-type="meat">Beef Patty 🥩 ($5.00)</button> <button data-ingredient="chicken-patty" data-price="4.50" data-type="meat">Chicken Patty 🍗 ($4.50)</button> <button data-ingredient="veggie-patty" data-price="4.00" data-type="meat">Veggie Patty 🥦 ($4.00)</button> </div>
+                    </div>
+
+                    <div class="ingredient-group">
+                        <label>Cheeses:</label> <div class="ingredient-buttons">
+                            <button data-ingredient="cheddar-cheese" data-price="1.00">Cheddar Cheese 🧀 ($1.00)</button> <button data-ingredient="swiss-cheese" data-price="1.20">Swiss Cheese ($1.20)</button> </div>
+                    </div>
+
+                    <div class="ingredient-group">
+                        <label>Vegetables:</label> <div class="ingredient-buttons">
+                            <button data-ingredient="lettuce" data-price="0.50">Lettuce 🥬 ($0.50)</button> <button data-ingredient="tomato" data-price="0.60">Tomato 🍅 ($0.60)</button> <button data-ingredient="onion" data-price="0.40">Onion 🧅 ($0.40)</button> <button data-ingredient="pickles" data-price="0.70">Pickles 🥒 ($0.70)</button> <button data-ingredient="jalapenos" data-price="0.80">Jalapeños 🌶️ ($0.80)</button> <button data-ingredient="mushrooms" data-price="0.90">Mushrooms 🍄 ($0.90)</button> <button data-ingredient="avocado" data-price="1.50">Avocado 🥑 ($1.50)</button> </div>
+                    </div>
+
+                    <div class="ingredient-group">
+                        <label>Extras:</label> <div class="ingredient-buttons">
+                            <button data-ingredient="bacon" data-price="1.80">Bacon 🥓 ($1.80)</button> <button data-ingredient="fried-egg" data-price="1.30">Fried Egg 🍳 ($1.30)</button> <button data-ingredient="bbq-sauce" data-price="0.70">BBQ Sauce 🍖 ($0.70)</button> </div>
+                    </div>
+
+                    <div class="ingredient-group">
+                        <label>Custom Ingredient:</label> <div class="custom-ingredient-input">
+                            <input type="text" id="custom-ingredient-name" placeholder="e.g., Special Sauce"> <input type="number" id="custom-ingredient-price" placeholder="Price ($)" min="0.1" step="0.1"> <button id="add-custom-ingredient-btn">Add</button> </div>
+                        <p id="custom-ingredient-error" class="error-message" style="display: none;">Please enter a valid name and price for your custom ingredient.</p> </div>
+                </div>
+            </div>
+            <p class="burger-total">Total: $<span id="burger-price">0.00</span></p> <div class="action-buttons">
+                <button id="save-burger-btn">Save Burger 💾</button> <button id="clear-burger-btn">Clear 🔄</button> </div>
+        </section>
+
+        <section id="all-burgers-section">
+            <h2>Your Created Burgers</h2> <div id="created-burgers-list">
+                <p id="no-burgers-message" style="text-align: center; color: var(--text-light); margin-top: 2rem;">You haven't created any burgers yet. Get started designing yours! 🤩</p> </div>
+        </section>
+
+        <section id="drinks-section">
+            <h2>Drinks 🥤</h2> <div class="menu-grid">
+                <div class="glass-card" data-item-id="cola-soda" data-item-name="Cola Soda" data-item-price="2.50"> <img src="img/coke.jpg" alt="Cola Soda"> <h3>Cola Soda</h3> <p>The classic fizzy drink that refreshes anytime.</p> <p class="price">$2.50</p> <button class="add-to-order-btn">Add to Order</button> </div>
+                <div class="glass-card" data-item-id="natural-lemonade" data-item-name="Natural Lemonade" data-item-price="3.00">
+                    <img src="img/lemonade.jpeg" alt="Natural Lemonade">
+                    <h3>Natural Lemonade</h3>
+                    <p>Made with fresh lemons and a touch of sweetness.</p>
+                    <p class="price">$3.00</p>
+                    <button class="add-to-order-btn">Add to Order</button>
+                </div>
+                <div class="glass-card" data-item-id="bottled-water" data-item-name="Bottled Water" data-item-price="1.50">
+                    <img src="img/aquafina-bottle.jpg" alt="Bottled Water">
+                    <h3>Bottled Water</h3>
+                    <p>Pure and refreshing, ideal to accompany your meal.</p>
+                    <p class="price">$1.50</p>
+                    <button class="add-to-order-btn">Add to Order</button>
+                </div>
+                <div class="glass-card" data-item-id="chocolate-milkshake" data-item-name="Chocolate Milkshake" data-item-price="4.50">
+                    <img src="img/Chocolate Milkshake.png" alt="Chocolate Milkshake">
+                    <h3>Chocolate Milkshake</h3>
+                    <p>Creamy and delicious, with the intense flavor of chocolate.</p>
+                    <p class="price">$4.50</p>
+                    <button class="add-to-order-btn">Add to Order</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="fries-section">
+            <h2>Fries 🍟</h2> <div class="menu-grid">
+                <div class="glass-card" data-item-id="classic-fries" data-item-name="Classic French Fries" data-item-price="3.50"> <img src="img/fries.jpg" alt="Classic French Fries"> <h3>Classic French Fries</h3> <p>Crispy on the outside, soft on the inside, the perfect complement.</p> <p class="price">$3.50</p> <button class="add-to-order-btn">Add to Order</button> </div>
+                <div class="glass-card" data-item-id="cheese-bacon-fries" data-item-name="Cheese & Bacon Fries" data-item-price="5.00">
+                    <img src="img/Cheese and Bacon Fries.jpg" alt="Cheese and Bacon Fries">
+                    <h3>Cheese & Bacon Fries</h3>
+                    <p>An explosion of flavor with melted cheese and crispy bacon.</p>
+                    <p class="price">$5.00</p>
+                    <button class="add-to-order-btn">Add to Order</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="desserts-section">
+            <h2>Desserts 🍰</h2> <div class="menu-grid">
+                <div class="glass-card" data-item-id="brownie-icecream" data-item-name="Brownie with Ice Cream" data-item-price="4.00"> <img src="img/Brownie with Ice Cream.jpg" alt="Brownie with Ice Cream"> <h3>Brownie with Ice Cream</h3> <p>Warm and fudgy, served with a scoop of vanilla ice cream.</p> <p class="price">$4.00</p> <button class="add-to-order-btn">Add to Order</button> </div>
+                <div class="glass-card" data-item-id="strawberry-cheesecake" data-item-name="Strawberry Cheesecake" data-item-price="4.80">
+                    <img src="img/strawberry-cheesecake-11.jpg" alt="Strawberry Cheesecake">
+                    <h3>Strawberry Cheesecake</h3>
+                    <p>Smooth and creamy, with a layer of delicious strawberry sauce.</p>
+                    <p class="price">$4.80</p>
+                    <button class="add-to-order-btn">Add to Order</button>
+                </div>
+                <div class="glass-card" data-item-id="carrot-cake" data-item-name="Carrot Cake" data-item-price="4.20">
+                    <img src="img/carrot-cake.jpg" alt="Carrot Cake">
+                    <h3>Carrot Cake</h3>
+                    <p>Moist and spiced, topped with cream cheese frosting.</p>
+                    <p class="price">$4.20</p>
+                    <button class="add-to-order-btn">Add to Order</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="order-summary-section">
+            <h2>Your Current Order</h2> <ul id="order-list">
+                <p id="empty-order-message" style="text-align: center; color: var(--text-light); margin-top: 1rem;">Your order is empty. Start adding delicious items! 😋</p> </ul>
+            <p id="order-total">Total Order: $<span id="current-order-price">0.00</span></p> <div id="order-buttons">
+                <button id="checkout-btn">Checkout Now! 🚀</button> <button id="clear-order-list-btn">Clear Order 🗑️</button> </div>
+        </section>
+    </main>
+
+    <div id="delete-confirm-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span> <h3>Are you sure you want to delete this burger?</h3> <p>This action cannot be undone.</p> <div class="modal-buttons">
+                <button class="confirm" id="confirm-delete-btn">Yes, Delete</button> <button class="cancel" id="cancel-delete-btn">Cancel</button> </div>
+        </div>
+    </div>
+
+    <div id="thank-you-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span> <h3>Thank You for Your Purchase! 🎉</h3> <img src="https://em-content.zobj.net/source/microsoft-teams/337/sparkles_2728.png" alt="Celebration"> <p>Your order is confirmed and will be delivered shortly. Enjoy your meal!</p> <div class="modal-buttons">
+                <button class="confirm" id="close-thank-you-modal">Got It</button> </div>
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confetti-container"></div> <button id="scroll-to-top-btn" title="Go to top">&#x2191;</button> <script>
+        // --- DOM Element References ---
+        const burgerPreview = document.getElementById('burger-preview'); // Reference to the burger preview area
+        const burgerPriceSpan = document.getElementById('burger-price'); // Reference to the span displaying burger price
+        const ingredientButtons = document.querySelectorAll('.ingredient-buttons button'); // All ingredient selection buttons
+        const customIngredientNameInput = document.getElementById('custom-ingredient-name'); // Input for custom ingredient name
+        const customIngredientPriceInput = document.getElementById('custom-ingredient-price'); // Input for custom ingredient price
+        const addCustomIngredientBtn = document.getElementById('add-custom-ingredient-btn'); // Button to add custom ingredient
+        const saveBurgerBtn = document.getElementById('save-burger-btn'); // Button to save or update burger
+        const clearBurgerBtn = document.getElementById('clear-burger-btn'); // Button to clear burger builder
+        const createdBurgersList = document.getElementById('created-burgers-list'); // List where created burgers are displayed
+        const noBurgersMessage = document.getElementById('no-burgers-message'); // Message displayed when no burgers are saved
+        const burgerNameInput = document.getElementById('burger-name'); // Input for burger name
+        const burgerNameError = document.getElementById('burger-name-error'); // Error message for burger name
+        const customIngredientError = document.getElementById('custom-ingredient-error'); // Error message for custom ingredient
+
+        // --- Order Summary Elements ---
+        const orderList = document.getElementById('order-list'); // Unordered list for order items
+        const currentOrderPriceSpan = document.getElementById('current-order-price'); // Span for total order price
+        const checkoutBtn = document.getElementById('checkout-btn'); // Button to checkout
+        const clearOrderListBtn = document.getElementById('clear-order-list-btn'); // Button to clear order list
+        const emptyOrderMessage = document.getElementById('empty-order-message'); // Message displayed when order is empty
+        const addToOrderSideButtons = document.querySelectorAll('.glass-card .add-to-order-btn'); // Buttons to add side items to order
+
+        // --- Modal References ---
+        const deleteConfirmModal = document.getElementById('delete-confirm-modal'); // Delete confirmation modal
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn'); // Button to confirm delete
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn'); // Button to cancel delete
+        const thankYouModal = document.getElementById('thank-you-modal'); // Thank you modal after checkout
+        const closeThankYouModalBtn = document.getElementById('close-thank-you-modal'); // Button to close thank you modal
+        const closeButtons = document.querySelectorAll('.close-button'); // All close buttons for modals
+        const confettiContainer = document.getElementById('confetti-container'); // Container for confetti animation
+
+        // --- Hamburger Menu Elements ---
+        const hamburgerIcon = document.getElementById('hamburger-icon'); // Hamburger icon element
+        const overlayMenu = document.getElementById('overlay-menu'); // Overlay menu element
+        const closeOverlayBtn = document.getElementById('close-overlay-btn'); // Close button for overlay menu
+        const overlayMenuLinks = document.querySelectorAll('.overlay-menu-content a'); // All links in the overlay menu
+
+        // --- Scroll to Top Button ---
+        const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
+
+
+        // --- Global State Variables ---
+        let currentBurgerIngredients = []; // Stores selected ingredients for the burger being built
+        let currentBurgerPrice = 0;      // Current total price of the burger being built
+        let burgers = JSON.parse(localStorage.getItem('burgers')) || []; // Load saved burgers from localStorage, or empty array
+        let editingBurgerIndex = -1;     // -1 means not editing; holds index of burger being edited
+
+        // Stores items currently in the main order (burgers + sides)
+        let currentOrder = JSON.parse(localStorage.getItem('currentOrder')) || []; // Load current order from localStorage
+
+        // --- Ingredient Image and Style Mapping (Improved for Realism) ---
+        // Maps ingredient names to their corresponding image URLs and CSS classes/heights
+        const ingredientVisuals = {
+            'bun-top': { class: 'bun-top', src: 'https://i.ibb.co/YyY2X83/burger-bun-top.png', height: 60, zIndex: 100 }, // Top bun properties
+            'bun-bottom': { class: 'bun-bottom', src: 'https://i.ibb.co/3kM2Z4d/burger-bun-bottom.png', height: 45, zIndex: 1 }, // Bottom bun properties
+            'beef-patty': { class: 'meat', src: 'https://i.ibb.co/rFxj88M/beef-patty.png', height: 45, zIndex: 10 }, // Beef patty properties
+            'chicken-patty': { class: 'meat', src: 'https://i.ibb.co/gP1s6q4/chicken-patty.png', height: 45, zIndex: 10 }, // Chicken patty properties
+            'veggie-patty': { class: 'meat', src: 'https://i.ibb.co/Q8Q492p/veggie-patty.png', height: 45, zIndex: 10 }, // Veggie patty properties
+            'cheddar-cheese': { class: 'cheese', src: 'https://i.ibb.co/zZ1QJ55/cheddar-cheese.png', height: 15, zIndex: 20 }, // Cheddar cheese properties
+            'swiss-cheese': { class: 'cheese', src: 'https://i.ibb.co/yYwG6v2/swiss-cheese.png', height: 15, zIndex: 20 }, // Swiss cheese properties
+            'lettuce': { class: 'lettuce', src: 'https://i.ibb.co/Qnyb2fQ/lettuce.png', height: 20, zIndex: 30 }, // Lettuce properties
+            'tomato': { class: 'tomato', src: 'https://i.ibb.co/30h1610/tomato-slice.png', height: 25, zIndex: 40 }, // Tomato properties
+            'onion': { class: 'onion', src: 'https://i.ibb.co/Gnjv2Qx/onion-ring.png', height: 20, zIndex: 50 }, // Onion properties
+            'bacon': { class: 'bacon', src: 'https://i.ibb.co/bFqYy0N/bacon.png', height: 15, zIndex: 60 }, // Bacon properties
+            'pickles': { class: 'pickles', src: 'https://i.ibb.co/K287F4b/pickles.png', height: 18, zIndex: 70 }, // Pickles properties
+            'fried-egg': { class: 'egg', src: 'https://i.ibb.co/sK9Z61Z/fried-egg.png', height: 30, zIndex: 80 }, // Fried egg properties
+            'jalapenos': { class: 'jalapenos', src: 'https://i.ibb.co/R9m0X7c/jalapenos.png', height: 15, zIndex: 90 }, // Jalapeños properties
+            'mushrooms': { class: 'mushrooms', src: 'https://i.ibb.co/y4p163j/mushrooms.png', height: 20, zIndex: 91 }, // Mushrooms properties
+            'avocado': { class: 'avocado', src: 'https://i.ibb.co/2d7j44M/avocado.png', height: 25, zIndex: 92 }, // Avocado properties
+            'bbq-sauce': { class: 'bbq-sauce', src: 'https://i.ibb.co/346sR12/bbq-sauce.png', height: 10, zIndex: 93 } // BBQ sauce properties
+        };
+
+        // --- Function to Update Burger Visual Preview with Realistic Stacking ---
+        function updateBurgerPreview() {
+            burgerPreview.innerHTML = ''; // Clear all current ingredients from preview
+
+            // Always render the bottom bun as the foundation
+            const bottomBunData = ingredientVisuals['bun-bottom']; // Get bottom bun data
+            const bottomBunEl = document.createElement('div'); // Create a new div for bottom bun
+            bottomBunEl.classList.add('burger-ingredient', bottomBunData.class, 'added'); // Add CSS classes
+            bottomBunEl.dataset.ingredient = 'bun-bottom'; // Set data attribute
+            bottomBunEl.style.height = `${bottomBunData.height}px`; // Set height
+            bottomBunEl.style.zIndex = bottomBunData.zIndex; // Set z-index
+            bottomBunEl.style.bottom = '0px'; // Anchored at the bottom of the preview container
+            const bottomBunImg = document.createElement('img'); // Create image element
+            bottomBunImg.src = bottomBunData.src; // Set image source
+            bottomBunImg.alt = "Bottom Bun"; // Set alt text
+            bottomBunEl.appendChild(bottomBunImg); // Add image to bun element
+            burgerPreview.appendChild(bottomBunEl); // Add bun element to preview
+
+            let currentStackHeight = bottomBunData.height - 15; // Initial height above bottom bun, with overlap for visual realism
+
+            // Sort ingredients for correct stacking order (lower z-index first, then by height for custom ingredients)
+            const sortedIngredients = [...currentBurgerIngredients].sort((a, b) => {
+                const zA = ingredientVisuals[a.name] ? ingredientVisuals[a.name].zIndex : 99; // Get z-index or default
+                const zB = ingredientVisuals[b.name] ? ingredientVisuals[b.name].zIndex : 99; // Get z-index or default
+                if (zA !== zB) {
+                    return zA - zB; // Sort by z-index
+                }
+                // If z-indexes are the same, sort by height (taller elements first, or just arbitrary consistent order)
+                const heightA = ingredientVisuals[a.name] ? ingredientVisuals[a.name].height : 25;
+                const heightB = ingredientVisuals[b.name] ? ingredientVisuals[b.name].height : 25;
+                return heightA - heightB; // Ensures consistent stacking for similar items
+            });
+
+            sortedIngredients.forEach(ing => {
+                const ingredientData = ingredientVisuals[ing.name] || { class: 'custom-ingredient', height: 25, zIndex: 99 }; // Get ingredient data or default for custom
+                const ingredientEl = document.createElement('div'); // Create div for ingredient
+                ingredientEl.classList.add('burger-ingredient', ingredientData.class); // Add CSS classes
+                ingredientEl.dataset.ingredient = ing.name; // Set data attribute
+                ingredientEl.style.height = `${ingredientData.height}px`; // Set height
+                ingredientEl.style.zIndex = ingredientData.zIndex; // Set z-index
+
+                // Calculate position based on current stack height from the bottom of the preview container
+                ingredientEl.style.bottom = `${currentStackHeight}px`;
+
+                if (ingredientData.src) {
+                    const img = document.createElement('img'); // Create image element
+                    img.src = ingredientData.src; // Set image source
+                    img.alt = ing.name.replace(/-/g, ' '); // Set alt text
+                    ingredientEl.appendChild(img); // Add image to ingredient element
+                } else {
+                    // For custom ingredients without images
+                    ingredientEl.textContent = ing.name.replace('custom-', '').split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '); // Display name for custom
+                    ingredientEl.style.backgroundColor = '#8d6e63'; // Fallback background for custom
+                    ingredientEl.style.color = 'white'; // White text
+                    ingredientEl.style.display = 'flex'; // Flexbox for centering text
+                    ingredientEl.style.alignItems = 'center'; // Center vertically
+                    ingredientEl.style.justifyContent = 'center'; // Center horizontally
+                    ingredientEl.style.fontSize = '0.7em'; // Smaller font size
+                }
+
+                // Apply 'adding' animation class and then remove it to trigger transition
+                ingredientEl.classList.add('adding'); // Add adding class
+                burgerPreview.appendChild(ingredientEl); // Append to preview
+
+                // Force reflow for animation to play
+                void ingredientEl.offsetWidth; // Trigger reflow by accessing a property that forces layout
+                ingredientEl.classList.remove('adding'); // Remove adding class
+                ingredientEl.classList.add('added'); // Add added class to keep it in final state
+
+                // Update stack height for next ingredient
+                // Adjust overlap for visual realism (e.g., cheese melts slightly, lettuce is fluffy)
+                let overlap = 10; // Default overlap
+                if (ingredientData.class === 'meat' || ingredientData.class === 'cheese' || ingredientData.class === 'bbq-sauce') {
+                    overlap = 5; // Smaller overlap for flatter ingredients
+                } else if (ingredientData.class === 'bun-top') {
+                    overlap = 0; // No overlap for top bun, as it sits on top
+                }
+                currentStackHeight += ingredientData.height - overlap; // Increment stack height with overlap
+            });
+
+            // Add the top bun if there's any meat patty
+            const hasMeat = currentBurgerIngredients.some(ing => ing.type === 'meat'); // Check if there's a meat patty
+            if (hasMeat) {
+                const topBunData = ingredientVisuals['bun-top']; // Get top bun data
+                const topBunEl = document.createElement('div'); // Create div for top bun
+                topBunEl.classList.add('burger-ingredient', topBunData.class); // Add CSS classes
+                topBunEl.dataset.ingredient = 'bun-top'; // Set data attribute
+                topBunEl.style.height = `${topBunData.height}px`; // Set height
+                topBunEl.style.zIndex = topBunData.zIndex; // Set z-index
+                topBunEl.style.bottom = `${currentStackHeight}px`; // Position on top of everything
+                const topBunImg = document.createElement('img'); // Create image element
+                topBunImg.src = topBunData.src; // Set image source
+                topBunImg.alt = "Top Bun"; // Set alt text
+                topBunEl.appendChild(topBunImg); // Add image to bun element
+
+                // Apply 'adding' animation class
+                topBunEl.classList.add('adding'); // Add adding class
+                burgerPreview.appendChild(topBunEl); // Append to preview
+                void topBunEl.offsetWidth; // Trigger reflow
+                topBunEl.classList.remove('adding'); // Remove adding class
+                topBunEl.classList.add('added'); // Add added class
+            }
+        }
+
+
+        // --- Function to Update Burger Total Price (for the burger being built) ---
+        function updateBurgerPrice() {
+            currentBurgerPrice = 0; // Reset price
+            currentBurgerIngredients.forEach(ingredient => {
+                currentBurgerPrice += ingredient.price; // Add ingredient price
+            });
+            // Always add price of bottom bun (which is always present)
+            currentBurgerPrice += 1.00; // Base price for bottom bun
+            // Add price of top bun only if there's a meat patty
+            const hasMeat = currentBurgerIngredients.some(ing => ing.type === 'meat'); // Check for meat
+            if (hasMeat) {
+                 currentBurgerPrice += 1.00; // Price for top bun
+            }
+
+            burgerPriceSpan.textContent = currentBurgerPrice.toFixed(2); // Display price formatted to two decimal places
+        }
+
+        // --- Function to Add an Ingredient to the current burger being built ---
+        function addIngredient(name, price, type = 'standard') {
+            // Logic for meat: only one meat patty allowed
+            if (type === 'meat') {
+                // Remove any existing meat patty
+                currentBurgerIngredients = currentBurgerIngredients.filter(ing => ing.type !== 'meat');
+                // Deactivate the button of the previously selected meat
+                ingredientButtons.forEach(btn => {
+                    if (btn.dataset.type === 'meat') {
+                        btn.classList.remove('active'); // Remove 'active' class from other meat buttons
+                    }
+                });
+            }
+
+            currentBurgerIngredients.push({ name, price, type }); // Add ingredient to array
+            updateBurgerPreview(); // Update visual
+            updateBurgerPrice();   // Update price
+        }
+
+        // --- Function to Remove an Ingredient from the current burger being built ---
+        function removeIngredient(name) {
+            const index = currentBurgerIngredients.findIndex(ingredient => ingredient.name === name); // Find index of ingredient
+            if (index > -1) {
+                // Get the element to animate out
+                const elementToRemove = burgerPreview.querySelector(`.burger-ingredient[data-ingredient="${name}"]`); // Find the corresponding DOM element
+                if (elementToRemove) {
+                    elementToRemove.classList.remove('added'); // Remove 'added' class
+                    elementToRemove.classList.add('removing'); // Add 'removing' class to trigger animation
+                    elementToRemove.addEventListener('transitionend', () => { // Listen for animation end
+                        currentBurgerIngredients.splice(index, 1); // Remove ingredient from array after animation
+                        updateBurgerPreview(); // Update visual after transition
+                        updateBurgerPrice();   // Update price
+                    }, { once: true }); // Ensure event listener runs only once
+                } else {
+                    // Fallback if element not found (shouldn't happen with correct logic)
+                    currentBurgerIngredients.splice(index, 1); // Remove immediately
+                    updateBurgerPreview(); // Update visual
+                    updateBurgerPrice();   // Update price
+                }
+            }
+        }
+
+        // --- Event Listener for Predefined Ingredient Buttons ---
+        ingredientButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const ingredientName = button.dataset.ingredient; // Get ingredient name from data attribute
+                const ingredientPrice = parseFloat(button.dataset.price); // Get ingredient price
+                const ingredientType = button.dataset.type || 'standard'; // Get ingredient type, default to 'standard'
+
+                const isSelected = currentBurgerIngredients.some(ing => ing.name === ingredientName); // Check if ingredient is already selected
+
+                if (ingredientType === 'meat') {
+                    // Specific logic for meat type buttons (only one meat patty allowed)
+                    if (isSelected) {
+                        removeIngredient(ingredientName); // Remove if already selected
+                        button.classList.remove('active'); // Deactivate button
+                    } else {
+                        addIngredient(ingredientName, ingredientPrice, ingredientType); // Add if not selected
+                        button.classList.add('active'); // Activate button
+                    }
+                } else {
+                    // General logic for other ingredient types (toggle on/off)
+                    if (isSelected) {
+                        removeIngredient(ingredientName); // Remove if selected
+                        button.classList.remove('active'); // Deactivate button
+                    } else {
+                        addIngredient(ingredientName, ingredientPrice, ingredientType); // Add if not selected
+                        button.classList.add('active'); // Activate button
+                    }
+                }
+            });
+        });
+
+        // --- Event Listener for Adding Custom Ingredient ---
+        addCustomIngredientBtn.addEventListener('click', () => {
+            const name = customIngredientNameInput.value.trim(); // Get custom ingredient name
+            const price = parseFloat(customIngredientPriceInput.value); // Get custom ingredient price
+
+            if (name && !isNaN(price) && price > 0) {
+                customIngredientError.style.display = 'none'; // Hide error message if valid
+                // Ensure custom ingredient names don't conflict with predefined ones for visual mapping
+                const safeName = `custom-${name.toLowerCase().replace(/\s/g, '-')}`; // Create a safe, unique name
+                addIngredient(safeName, price, 'custom'); // Add custom ingredient
+                customIngredientNameInput.value = ''; // Clear input field
+                customIngredientPriceInput.value = ''; // Clear input field
+            } else {
+                customIngredientError.style.display = 'block'; // Show error if invalid input
+            }
+        });
+
+        // --- Function to Clear Current Burger Builder ---
+        function clearBurgerBuilder() {
+            currentBurgerIngredients = []; // Empty ingredients array
+            updateBurgerPreview(); // Update visual (only bottom bun remains)
+            updateBurgerPrice();   // Reset price to base bun price
+            burgerNameInput.value = ''; // Clear burger name
+            burgerNameError.style.display = 'none'; // Hide name error message
+            customIngredientError.style.display = 'none'; // Hide custom ingredient error message
+            editingBurgerIndex = -1; // Reset editing index
+            saveBurgerBtn.textContent = 'Save Burger 💾'; // Restore save button text
+
+            // Deactivate all ingredient buttons
+            ingredientButtons.forEach(button => {
+                button.classList.remove('active'); // Remove 'active' class from all buttons
+            });
+        }
+
+        // --- Event Listener for Clear Burger Button (clears builder, not order) ---
+        clearBurgerBtn.addEventListener('click', clearBurgerBuilder);
+
+        // --- Function to Save or Update Burger ---
+        function saveOrUpdateBurger() {
+            const burgerName = burgerNameInput.value.trim(); // Get burger name
+
+            if (!burgerName) {
+                burgerNameError.style.display = 'block'; // Show error if no name
+                return; // Stop function execution
+            } else {
+                burgerNameError.style.display = 'none'; // Hide error
+            }
+
+            if (currentBurgerIngredients.filter(ing => ing.type === 'meat').length === 0) {
+                alert('Please select at least one patty for your burger.'); // Alert if no patty selected
+                return; // Stop function execution
+            }
+
+            // Create a copy of ingredients to save
+            const ingredientsToSave = JSON.parse(JSON.stringify(currentBurgerIngredients)); // Deep copy ingredients
+
+            const newBurger = {
+                id: editingBurgerIndex === -1 ? Date.now() : burgers[editingBurgerIndex].id, // New ID or existing ID
+                name: burgerName, // Burger name
+                ingredients: ingredientsToSave, // Ingredients list
+                price: parseFloat(currentBurgerPrice.toFixed(2)) // Burger price, rounded to 2 decimals
+            };
+
+            if (editingBurgerIndex > -1) {
+                // Update existing burger
+                burgers[editingBurgerIndex] = newBurger; // Replace existing burger
+                alert(`Burger "${burgerName}" updated successfully!`); // Confirmation message
+            } else {
+                // Save new burger
+                burgers.push(newBurger); // Add new burger to array
+                alert(`Burger "${burgerName}" saved successfully!`); // Confirmation message
+            }
+
+            localStorage.setItem('burgers', JSON.stringify(burgers)); // Save burgers array to localStorage
+            renderCreatedBurgers(); // Re-render the list of created burgers
+            clearBurgerBuilder(); // Clear builder after saving
+        }
+
+        // --- Event Listener for Save Burger Button ---
+        saveBurgerBtn.addEventListener('click', saveOrUpdateBurger);
+
+        // --- Confetti Animation Logic ---
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']; // Array of confetti colors
+            const numConfetti = 50; // Number of confetti pieces
+
+            for (let i = 0; i < numConfetti; i++) {
+                const confetti = document.createElement('div'); // Create confetti div
+                confetti.classList.add('confetti'); // Add confetti class
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; // Random color
+
+                // Random starting position near the center of the modal
+                const startX = thankYouModal.getBoundingClientRect().left + thankYouModal.offsetWidth / 2 + (Math.random() - 0.5) * 50; // Calculate random start X
+                const startY = thankYouModal.getBoundingClientRect().top + thankYouModal.offsetHeight / 2 + (Math.random() - 0.5) * 50; // Calculate random start Y
+
+                // Random ending position and rotation
+                const endX = startX + (Math.random() - 0.5) * 600; // Spread horizontally
+                const endY = startY + window.innerHeight * Math.random(); // Fall downwards
+                const rotateEnd = Math.random() * 720; // Rotate multiple times
+
+                confetti.style.setProperty('--x', `${startX}px`); // Set CSS variable for start X
+                confetti.style.setProperty('--y', `${startY}px`); // Set CSS variable for start Y
+                confetti.style.setProperty('--x-end', `${endX}px`); // Set CSS variable for end X
+                confetti.style.setProperty('--y-end', `${endY}px`); // Set CSS variable for end Y
+                confetti.style.setProperty('--rotate-end', `${rotateEnd}`); // Set CSS variable for end rotation
+                confetti.style.animationDuration = `${Math.random() * 2 + 1}s`; // Random duration (1 to 3 seconds)
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`; // Staggered start delay
+
+                confettiContainer.appendChild(confetti); // Add confetti to container
+
+                // Remove confetti after animation to clean up DOM
+                confetti.addEventListener('animationend', () => {
+                    confetti.remove(); // Remove element from DOM
+                });
+            }
+        }
+
+        // --- Close Modals Functionality ---
+        closeThankYouModalBtn.addEventListener('click', () => {
+            thankYouModal.style.display = 'none'; // Hide thank you modal
+            confettiContainer.innerHTML = ''; // Clear confetti elements
+        });
+
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.target.closest('.modal').style.display = 'none'; // Hide the closest modal
+                if (event.target.closest('#thank-you-modal')) {
+                    confettiContainer.innerHTML = ''; // Clear confetti if thank you modal is closed
+                }
+            });
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === deleteConfirmModal) {
+                deleteConfirmModal.style.display = 'none'; // Hide delete modal if clicked outside
+            }
+            if (event.target === thankYouModal) {
+                thankYouModal.style.display = 'none'; // Hide thank you modal if clicked outside
+                confettiContainer.innerHTML = ''; // Clear confetti
+            }
+        });
+
+        // --- Function to Render Created Burgers List ---
+        function renderCreatedBurgers() {
+            createdBurgersList.innerHTML = ''; // Clear current list
+
+            if (burgers.length === 0) {
+                noBurgersMessage.style.display = 'block'; // Show "no burgers" message
+            }
+            else {
+                noBurgersMessage.style.display = 'none'; // Hide message
+                burgers.forEach((burger, index) => {
+                    const burgerCard = document.createElement('div'); // Create div for burger card
+                    burgerCard.classList.add('burger-card'); // Add CSS class
+
+                    // Map ingredient names for friendly display
+                    const ingredientNames = burger.ingredients
+                        .filter(ing => ing.name !== 'bun-top' && ing.name !== 'bun-bottom') // Filter out bun items
+                        .map(ing => {
+                            let displayName = ing.name.replace(/-/g, ' ') // Replace hyphens with spaces
+                                .replace('custom ', '') // Remove "custom " prefix if present
+                                .split(' ') // Split by space
+                                .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+                                .join(' '); // Join words back
+                            return displayName;
+                        });
+
+                    burgerCard.innerHTML = `
+                        <h3>${burger.name}</h3> <p>Ingredients: ${ingredientNames.join(', ')}</p> <p class="price">Price: $${burger.price.toFixed(2)}</p> <div class="card-actions">
+                            <button class="edit-btn" data-index="${index}">Edit ✏️</button> <button class="add-to-order-btn-burger" data-burger-id="${burger.id}" data-burger-name="${burger.name}" data-burger-price="${burger.price.toFixed(2)}">Add to Order 🛒</button> <button class="delete-btn" data-index="${index}">Delete 🗑️</button> </div>
+                    `;
+                    createdBurgersList.appendChild(burgerCard); // Add card to the list
+                });
+
+                // Add event listeners for new edit, add to order, and delete buttons
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const indexToEdit = parseInt(event.target.dataset.index); // Get index to edit
+                        editBurger(indexToEdit); // Call edit burger function
+                    });
+                });
+
+                document.querySelectorAll('.add-to-order-btn-burger').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const burgerId = event.target.dataset.burgerId; // Get burger ID
+                        const burgerName = event.target.dataset.burgerName; // Get burger name
+                        const burgerPrice = parseFloat(event.target.dataset.burgerPrice); // Get burger price
+                        addItemToOrder({
+                            id: burgerId, // Item ID
+                            name: burgerName, // Item name
+                            price: burgerPrice, // Item price
+                            type: 'burger' // Item type
+                        });
+                        document.getElementById('order-summary-section').scrollIntoView({ behavior: 'smooth' }); // Scroll to order summary
+                    });
+                });
+
+
+                let burgerToDeleteIndex = -1; // Temp storage for burger to delete
+
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        burgerToDeleteIndex = parseInt(event.target.dataset.index); // Get index of burger to delete
+                        deleteConfirmModal.style.display = 'flex'; // Show confirmation modal
+                    });
+                });
+
+                confirmDeleteBtn.onclick = function() {
+                    if (burgerToDeleteIndex !== -1) {
+                        deleteBurger(burgerToDeleteIndex); // Call delete burger function
+                        burgerToDeleteIndex = -1; // Reset index
+                    }
+                    deleteConfirmModal.style.display = 'none'; // Hide modal
+                };
+
+                cancelDeleteBtn.onclick = function() {
+                    deleteConfirmModal.style.display = 'none'; // Hide modal
+                    burgerToDeleteIndex = -1; // Reset index
+                };
+            }
+        }
+
+        // --- Function to Edit a Burger ---
+        function editBurger(index) {
+            const burgerToEdit = burgers[index]; // Get the burger object to edit
+            clearBurgerBuilder(); // Clear the creation interface first
+
+            burgerNameInput.value = burgerToEdit.name; // Set burger name in input field
+            // Load ingredients (filter out bun data which is handled visually)
+            currentBurgerIngredients = burgerToEdit.ingredients.filter(ing => ing.name !== 'bun-top' && ing.name !== 'bun-bottom'); // Set current ingredients
+
+            // Activate corresponding ingredient buttons
+            ingredientButtons.forEach(button => {
+                const ingredientName = button.dataset.ingredient; // Get button's ingredient name
+                const isSelected = currentBurgerIngredients.some(ing => ing.name === ingredientName); // Check if selected
+                if (isSelected) {
+                    button.classList.add('active'); // Add active class
+                } else {
+                    button.classList.remove('active'); // Remove active class
+                }
+            });
+
+            updateBurgerPreview(); // Update visual with loaded ingredients
+            updateBurgerPrice();   // Update price
+            editingBurgerIndex = index; // Set editing index
+            saveBurgerBtn.textContent = 'Update Burger ✏️'; // Change button text to "Update"
+            document.getElementById('burger-creator-section').scrollIntoView({ behavior: 'smooth' }); // Scroll to creator section
+        }
+
+        // --- Function to Delete a Burger ---
+        function deleteBurger(index) {
+            burgers.splice(index, 1); // Remove burger from array
+            localStorage.setItem('burgers', JSON.stringify(burgers)); // Update localStorage
+            renderCreatedBurgers(); // Re-render list
+            // If the deleted burger was being edited, clear the form
+            if (editingBurgerIndex === index) {
+                clearBurgerBuilder(); // Clear builder if editing the deleted burger
+            }
+        }
+
+        // --- Order Management Functions ---
+
+        // Function to add an item (burger or side) to the current order
+        function addItemToOrder(item) {
+            const existingItem = currentOrder.find(orderItem => orderItem.id === item.id); // Check if item already in order
+            if (existingItem) {
+                existingItem.quantity++; // Increment quantity if item exists
+            } else {
+                currentOrder.push({ ...item, quantity: 1 }); // Add new item with quantity 1
+            }
+            localStorage.setItem('currentOrder', JSON.stringify(currentOrder)); // Save order to localStorage
+            renderOrderSummary(); // Update order summary display
+        }
+
+        // Function to remove an item from the current order or decrease its quantity
+        function removeItemFromOrder(itemId) {
+            const index = currentOrder.findIndex(orderItem => orderItem.id === itemId); // Find index of item
+            if (index > -1) {
+                if (currentOrder[index].quantity > 1) {
+                    currentOrder[index].quantity--; // Decrement quantity if > 1
+                }
+                else {
+                    currentOrder.splice(index, 1); // Remove completely if quantity is 1
+                }
+            }
+            localStorage.setItem('currentOrder', JSON.stringify(currentOrder)); // Save updated order to localStorage
+            renderOrderSummary(); // Update order summary display
+        }
+
+        // Function to render the order summary list
+        function renderOrderSummary() {
+            orderList.innerHTML = ''; // Clear current order list display
+            let totalOrderPrice = 0; // Initialize total price
+
+            if (currentOrder.length === 0) {
+                emptyOrderMessage.style.display = 'block'; // Show empty order message
+            } else {
+                emptyOrderMessage.style.display = 'none'; // Hide empty order message
+                currentOrder.forEach(item => {
+                    const listItem = document.createElement('li'); // Create list item
+                    listItem.classList.add('order-item'); // Add CSS class
+                    listItem.innerHTML = `
+                        <span class="order-item-name">${item.name} (x${item.quantity})</span> <span class="order-item-actions">
+                            $${(item.price * item.quantity).toFixed(2)} <button data-item-id="${item.id}">-</button> </span>
+                    `;
+                    orderList.appendChild(listItem); // Add item to order list
+                    totalOrderPrice += item.price * item.quantity; // Add to total order price
+                });
+            }
+            currentOrderPriceSpan.textContent = totalOrderPrice.toFixed(2); // Display total order price
+
+            // Add event listeners to the remove buttons in the order list
+            document.querySelectorAll('.order-item-actions button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const itemId = event.target.dataset.itemId; // Get item ID to remove
+                    removeItemFromOrder(itemId); // Call remove item function
+                });
+            });
+        }
+
+        // Event listener for "Add to Order" buttons for drinks, fries, and desserts
+        addToOrderSideButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const card = event.target.closest('.glass-card'); // Get the parent card element
+                const itemId = card.dataset.itemId; // Get item ID
+                const itemName = card.dataset.itemName; // Get item name
+                const itemPrice = parseFloat(card.dataset.itemPrice); // Get item price
+                addItemToOrder({
+                    id: itemId, // Item ID
+                    name: itemName, // Item name
+                    price: itemPrice, // Item price
+                    type: 'side' // Item type (side dish)
+                });
+                document.getElementById('order-summary-section').scrollIntoView({ behavior: 'smooth' }); // Scroll to order summary
+            });
+        });
+
+        // Event Listener for Checkout Button
+        checkoutBtn.addEventListener('click', () => {
+            if (currentOrder.length === 0) {
+                alert('Your order is empty! Please add some items before checking out.'); // Alert if order is empty
+                return; // Stop function execution
+            }
+            thankYouModal.style.display = 'flex'; // Show thank you modal
+            createConfetti(); // Trigger confetti animation
+            clearOrder(); // Clear the entire order after checkout
+        });
+
+        // Function to clear the entire order
+        function clearOrder() {
+            currentOrder = []; // Empty the order array
+            localStorage.removeItem('currentOrder'); // Clear order from local storage
+            renderOrderSummary(); // Update order summary display
+        }
+
+        // Event Listener for Clear Order List Button
+        clearOrderListBtn.addEventListener('click', clearOrder); // Call clear order function on click
+
+        // --- Hamburger Menu Logic ---
+        hamburgerIcon.addEventListener('click', () => {
+            overlayMenu.style.width = '100%'; // Expand overlay menu to full width
+        });
+
+        closeOverlayBtn.addEventListener('click', () => {
+            overlayMenu.style.width = '0%'; // Collapse overlay menu
+        });
+
+        // Close overlay menu when a link inside it is clicked (for smooth scrolling)
+        overlayMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                overlayMenu.style.width = '0%'; // Collapse overlay menu
+                // Get the target section ID from the href
+                const targetId = link.getAttribute('href');
+                if (targetId && targetId.startsWith('#')) {
+                    const targetElement = document.querySelector(targetId); // Find the target element
+                    if (targetElement) {
+                        // Scroll to the target element
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+
+        // --- Scroll to Top Button Logic ---
+        window.onscroll = function() { scrollFunction() };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                // Show button if scrolled down more than 200px
+                scrollToTopBtn.classList.add('show');
+            } else {
+                // Hide button if near the top
+                scrollToTopBtn.classList.remove('show');
+            }
+        }
+
+        scrollToTopBtn.addEventListener('click', () => {
+            // Scroll to the top of the document with smooth animation
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // --- Initialize Application on Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBurgerPrice();       // Ensure initial builder price is displayed (base bun price)
+            renderCreatedBurgers();    // Show saved burgers on load
+            updateBurgerPreview();     // Initial builder preview with just the bottom bun
+            renderOrderSummary();      // Render the current order summary on load
+        });
+    </script>
+</body>
+</html>
